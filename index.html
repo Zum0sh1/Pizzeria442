@@ -122,6 +122,15 @@
 </head>
 <body>
 
+<header>
+  <div class="logo">442</div>
+  <div class="header-text">
+    <h1>Pizza Kitchen &amp; Bar</h1>
+    <p>Food Experience — Menu</p>
+  </div>
+  <span class="badge">Solo visualizzazione</span>
+</header>
+
 <div id="canvas-container">
   <canvas id="pdf-canvas"></canvas>
   <div id="loading">
@@ -156,17 +165,21 @@
 
   function getScale() {
     const maxW = Math.min(window.innerWidth - 48, 720);
-    return maxW;
+    const dpr = window.devicePixelRatio || 1;
+    return { cssWidth: maxW, dpr };
   }
 
   function renderPage(num) {
     rendering = true;
     pdfDoc.getPage(num).then(function (page) {
       const baseVp = page.getViewport({ scale: 1 });
-      const scale = getScale() / baseVp.width;
+      const { cssWidth, dpr } = getScale();
+      const scale = (cssWidth / baseVp.width) * dpr;
       const vp = page.getViewport({ scale });
       canvas.width = vp.width;
       canvas.height = vp.height;
+      canvas.style.width = (vp.width / dpr) + 'px';
+      canvas.style.height = (vp.height / dpr) + 'px';
       page.render({ canvasContext: ctx, viewport: vp }).promise.then(function () {
         rendering = false;
         loading.style.display = 'none';
